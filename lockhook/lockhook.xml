@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lockhook" default="all">
+  
+  
+  <property file="lockhook.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.yarb/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.pipertmp-*/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.swc"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
+    <include name="*.egg"/>
+    <include name="*.ane"/>
+    <include name="*.jar"/>
+    <include name="*.ear"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/icedtea-sound.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/java-atk-wrapper.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/rt.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.asm-6.0.classpath">
+    <pathelement location="${basedir}/../lib/asm-6.0.jar"/>
+    <pathelement location="${basedir}/../lib/asm-analysis-6.0.jar"/>
+    <pathelement location="${basedir}/../lib/asm-commons-6.0.jar"/>
+    <pathelement location="${basedir}/../lib/asm-tree-6.0.jar"/>
+    <pathelement location="${basedir}/../lib/asm-util-6.0.jar"/>
+  </path>
+  
+  
+  <!-- Global Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module lockhook -->
+  
+  <dirname property="module.lockhook.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.lockhook" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.lockhook" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.lockhook" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.lockhook" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="lockhook.output.dir" value="${module.lockhook.basedir}/out/production/lockhook"/>
+  <property name="lockhook.testoutput.dir" value="${module.lockhook.basedir}/out/test/lockhook"/>
+  
+  <path id="lockhook.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="lockhook.module.production.classpath">
+    <path refid="${module.jdk.classpath.lockhook}"/>
+    <path refid="library.asm-6.0.classpath"/>
+  </path>
+  
+  <path id="lockhook.runtime.production.module.classpath">
+    <pathelement location="${lockhook.output.dir}"/>
+    <path refid="library.asm-6.0.classpath"/>
+  </path>
+  
+  <path id="lockhook.module.classpath">
+    <path refid="${module.jdk.classpath.lockhook}"/>
+    <pathelement location="${lockhook.output.dir}"/>
+    <path refid="library.asm-6.0.classpath"/>
+  </path>
+  
+  <path id="lockhook.runtime.module.classpath">
+    <pathelement location="${lockhook.testoutput.dir}"/>
+    <pathelement location="${lockhook.output.dir}"/>
+    <path refid="library.asm-6.0.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.lockhook">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.lockhook">
+    <patternset refid="excluded.from.module.lockhook"/>
+  </patternset>
+  
+  <path id="lockhook.module.sourcepath">
+    <dirset dir="${module.lockhook.basedir}">
+      <include name="src"/>
+      <include name="snakeyaml/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.lockhook" depends="compile.module.lockhook.production,compile.module.lockhook.tests" description="Compile module lockhook"/>
+  
+  <target name="compile.module.lockhook.production" depends="register.custom.compilers" description="Compile module lockhook; production classes">
+    <mkdir dir="${lockhook.output.dir}"/>
+    <javac2 destdir="${lockhook.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.lockhook}/javac">
+      <compilerarg line="${compiler.args.lockhook}"/>
+      <bootclasspath refid="lockhook.module.bootclasspath"/>
+      <classpath refid="lockhook.module.production.classpath"/>
+      <src refid="lockhook.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.lockhook"/>
+    </javac2>
+    
+    <copy todir="${lockhook.output.dir}">
+      <fileset dir="${module.lockhook.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.lockhook.tests" depends="register.custom.compilers,compile.module.lockhook.production" description="compile module lockhook; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.lockhook" description="cleanup module">
+    <delete dir="${lockhook.output.dir}"/>
+    <delete dir="${lockhook.testoutput.dir}"/>
+  </target>
+  
+  
+  <!-- Module testtarget -->
+  
+  <dirname property="module.testtarget.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.testtarget" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.testtarget" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.testtarget" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.testtarget" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="testtarget.output.dir" value="${module.testtarget.basedir}/out/production/testtarget"/>
+  <property name="testtarget.testoutput.dir" value="${module.testtarget.basedir}/out/test/testtarget"/>
+  
+  <path id="testtarget.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="testtarget.module.production.classpath">
+    <path refid="${module.jdk.classpath.testtarget}"/>
+  </path>
+  
+  <path id="testtarget.runtime.production.module.classpath">
+    <pathelement location="${testtarget.output.dir}"/>
+  </path>
+  
+  <path id="testtarget.module.classpath">
+    <path refid="${module.jdk.classpath.testtarget}"/>
+    <pathelement location="${testtarget.output.dir}"/>
+  </path>
+  
+  <path id="testtarget.runtime.module.classpath">
+    <pathelement location="${testtarget.testoutput.dir}"/>
+    <pathelement location="${testtarget.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.testtarget">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.testtarget">
+    <patternset refid="excluded.from.module.testtarget"/>
+  </patternset>
+  
+  <path id="testtarget.module.sourcepath">
+    <dirset dir="${module.testtarget.basedir}/../testtarget">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.testtarget" depends="compile.module.testtarget.production,compile.module.testtarget.tests" description="Compile module testtarget"/>
+  
+  <target name="compile.module.testtarget.production" depends="register.custom.compilers" description="Compile module testtarget; production classes">
+    <mkdir dir="${testtarget.output.dir}"/>
+    <javac2 destdir="${testtarget.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.testtarget}/javac">
+      <compilerarg line="${compiler.args.testtarget}"/>
+      <bootclasspath refid="testtarget.module.bootclasspath"/>
+      <classpath refid="testtarget.module.production.classpath"/>
+      <src refid="testtarget.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.testtarget"/>
+    </javac2>
+    
+    <copy todir="${testtarget.output.dir}">
+      <fileset dir="${module.testtarget.basedir}/../testtarget/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.testtarget.tests" depends="register.custom.compilers,compile.module.testtarget.production" description="compile module testtarget; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.testtarget" description="cleanup module">
+    <delete dir="${testtarget.output.dir}"/>
+    <delete dir="${testtarget.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.lockhook, clean.module.testtarget" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.lockhook, compile.module.testtarget" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.lockhook:jar" value="${basedir}/out/artifacts/lockhook_jar"/>
+    <property name="artifact.output.testtarget:jar" value="${basedir}/out/artifacts/testtarget_jar"/>
+    <property name="artifact.output.testtarget.pp:jar" value="${basedir}/out/artifacts/testtarget_pp_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.lockhook.jar" value="${artifacts.temp.dir}/lockhook.jar"/>
+    <property name="temp.jar.path.testtarget.jar" value="${artifacts.temp.dir}/testtarget.jar"/>
+    <property name="temp.jar.path.testtarget.pp.jar" value="${artifacts.temp.dir}/testtarget.pp.jar"/>
+  </target>
+  
+  <target name="artifact.lockhook:jar" depends="init.artifacts, compile.module.lockhook" description="Build &#39;lockhook:jar&#39; artifact">
+    <property name="artifact.temp.output.lockhook:jar" value="${artifacts.temp.dir}/lockhook_jar"/>
+    <mkdir dir="${artifact.temp.output.lockhook:jar}"/>
+    <jar destfile="${temp.jar.path.lockhook.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${lockhook.output.dir}"/>
+      <zipfileset src="${basedir}/../lib/asm-6.0.jar"/>
+      <zipfileset src="${basedir}/../lib/asm-analysis-6.0.jar"/>
+      <zipfileset src="${basedir}/../lib/asm-commons-6.0.jar"/>
+      <zipfileset src="${basedir}/../lib/asm-tree-6.0.jar"/>
+      <zipfileset src="${basedir}/../lib/asm-util-6.0.jar"/>
+      <manifest>
+        <attribute name="Main-Class" value="lockhook.Main"/>
+      </manifest>
+    </jar>
+    <copy file="${temp.jar.path.lockhook.jar}" tofile="${artifact.temp.output.lockhook:jar}/lockhook.jar"/>
+  </target>
+
+  <target name="artifact.testtarget:jar" depends="init.artifacts, compile.module.testtarget" description="Build &#39;testtarget:jar&#39; artifact">
+    <property name="artifact.temp.output.testtarget:jar" value="${artifacts.temp.dir}/testtarget_jar"/>
+    <mkdir dir="${artifact.temp.output.testtarget:jar}"/>
+    <jar destfile="${temp.jar.path.testtarget.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${testtarget.output.dir}"/>
+      <manifest>
+        <attribute name="Main-Class" value="lockhooktesttarget.Main"/>
+      </manifest>
+    </jar>
+    <copy file="${temp.jar.path.testtarget.jar}" tofile="${artifact.temp.output.testtarget:jar}/testtarget.jar"/>
+  </target>
+
+  <target name="artifact.testtarget.pp:jar" depends="init.artifacts, compile.module.testtarget, artifact.testtarget:jar, artifact.lockhook:jar" description="Build &#39;testtarget:jar&#39; artifact">
+    <property name="artifact.temp.output.testtarget.pp:jar" value="${artifacts.temp.dir}/testtarget_pp_jar"/>
+    <mkdir dir="${artifact.temp.output.testtarget.pp:jar}"/>
+    <java jar="${temp.jar.path.lockhook.jar}" fork="true" failonerror="true">
+      <arg value="-v"/>
+      <arg value="-i"/>
+      <arg value="${temp.jar.path.testtarget.jar}"/>
+      <arg value="-o"/>
+      <arg value="${temp.jar.path.testtarget.pp.jar}"/>
+      <arg value="--spec"/>
+      <arg value="${module.testtarget.basedir}/../testtarget/hookspec.yaml"/>
+    </java>
+    <copy file="${temp.jar.path.testtarget.pp.jar}" tofile="${artifact.temp.output.testtarget.pp:jar}/testtarget.pp.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.lockhook:jar, artifact.testtarget:jar, artifact.testtarget.pp:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.lockhook:jar}"/>
+    <copy todir="${artifact.output.lockhook:jar}">
+      <fileset dir="${artifact.temp.output.lockhook:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.testtarget:jar}"/>
+    <copy todir="${artifact.output.testtarget:jar}">
+      <fileset dir="${artifact.temp.output.testtarget:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.testtarget.pp:jar}"/>
+    <copy todir="${artifact.output.testtarget.pp:jar}">
+      <fileset dir="${artifact.temp.output.testtarget.pp:jar}"/>
+    </copy>
+
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

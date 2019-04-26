@@ -1,0 +1,29 @@
+java_library_host {
+    name: "lockhook.testtarget.pre",
+
+    srcs: [
+        "src/**/*.java",
+    ]
+}
+
+java_genrule_host {
+    name: "lockhook.testtarget.post",
+    srcs: [":lockhook.testtarget.pre"],
+    tools: ["lockhook"],
+    cmd: "$(location lockhook) " +
+        " --pre  lockhooktesttarget/Hook.pre" +
+        " --post lockhooktesttarget/Hook.post" +
+        " --target '.*'"+
+        " -v " +
+        " -o $(out)" +
+        " -i $(in)",
+    out: ["lockhook-testtarget.jar"],
+}
+
+java_binary_host {
+    name: "lockhook-testtarget",
+    manifest: "manifest.txt",
+    static_libs: [
+        "lockhook.testtarget.post",
+    ]
+}

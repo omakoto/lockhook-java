@@ -1,0 +1,42 @@
+---
+name: LockHook1
+
+# pre_trace:
+# post_trace:
+
+class:
+- .*
+
+ignore:
+- lockhooktesttarget/Hook
+
+ignore_annotation:
+- lockhooktesttarget/NoLockHook
+
+instance_lock_types:
+#- .*/Target
+#- .*/String
+
+class_lock_types:
+#- .*/Target
+
+sync_method_start: lockhooktesttarget/Hook.syncStart
+sync_method_end: lockhooktesttarget/Hook.syncEnd
+
+pre_enter: lockhooktesttarget/Hook.preEnter
+post_enter: lockhooktesttarget/Hook.postEnter
+
+pre_exit: lockhooktesttarget/Hook.preExit
+post_exit: lockhooktesttarget/Hook.postExit
+
+#---
+#name: LockHook2
+#
+#class:
+#- .*/Target2
+#
+#pre_enter: lockhooktesttarget/Hook.pre
+#post_enter:
+#
+#pre_exit:
+#post_exit: lockhooktesttarget/Hook.post

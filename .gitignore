@@ -1,3 +1,6 @@
+lockhook/out
+lockhook/.idea
+
 # Compiled class file
 *.class
 
